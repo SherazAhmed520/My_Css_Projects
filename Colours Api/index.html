@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    canvas {
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+    <button type="submit" onclick="startGame()">Start Game</button>
+  <canvas id="snakeCanvas" width="700" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("snakeCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const boxSize = 20; // Size of each box (snake segment and dot)
+    let snake = [{ x: 5 * boxSize, y: 5 * boxSize }];
+    let direction = "down";
+    let dot = {};
+    let score = 0;
+
+    function drawSnake() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? "#00f" : "#0f0";
+        ctx.fillRect(snake[i].x, snake[i].y, boxSize, boxSize);
+        ctx.strokeRect(snake[i].x, snake[i].y, boxSize, boxSize);
+      }
+
+      ctx.fillStyle = "#f00";
+      ctx.fillRect(dot.x, dot.y, boxSize, boxSize);
+      ctx.strokeRect(dot.x, dot.y, boxSize, boxSize);
+
+      ctx.fillStyle = "#000";
+      ctx.font = "20px Arial";
+      ctx.fillText("Score: " + score, 10, 30);
+    }
+
+    function updateSnake() {
+      const head = { ...snake[0] };
+
+      switch (direction) {
+        case "up":
+          head.y -= boxSize;
+          break;
+        case "down":
+          head.y += boxSize;
+          break;
+        case "left":
+          head.x -= boxSize;
+          break;
+        case "right":
+          head.x += boxSize;
+          break;
+      }
+
+      // Check if the snake eats the dot
+      if (head.x === dot.x && head.y === dot.y) {
+        score++;
+        generateDot();
+        snake.unshift(head);
+      } else {
+        snake.unshift(head);
+        snake.pop();
+      }
+
+      // Check if the snake hits the canvas border
+      if (
+        head.x < 0 ||
+        head.y < 0 ||
+        head.x >= canvas.width ||
+        head.y >= canvas.height
+      ) {
+        gameOver();
+      }
+    }
+
+    function generateDot() {
+      dot.x = Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize;
+      dot.y = Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize;
+    }
+
+    function handleKeyPress(event) {
+      switch (event.key) {
+        case "ArrowUp":
+          direction = "up";
+          break;
+        case "ArrowDown":
+          direction = "down";
+          break;
+        case "ArrowLeft":
+          direction = "left";
+          break;
+        case "ArrowRight":
+          direction = "right";
+          break;
+      }
+    }
+
+    function startGame() {
+      generateDot();
+
+      setInterval(() => {
+        updateSnake();
+        drawSnake();
+      }, 100);
+
+      document.addEventListener("keydown", handleKeyPress);
+    }
+
+    function gameOver() {
+      alert("Game Over! Your score is " + score);
+      location.reload(); // Reload the page to restart the game
+    }
+
+    
+    // startGame();
+  </script>
+</body>
+</html>

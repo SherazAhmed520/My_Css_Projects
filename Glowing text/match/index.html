@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Game</title>
+    <style>
+        /* CSS styles for your website */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .team-selection {
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .scoreboard, .batting, .bowling, .toss {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        span {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+        .player-stats {
+            text-align: left;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cricket Game</h1>
+    <div class="container">
+        <div class="toss">
+            <h2>Toss</h2>
+            <button id="tossButton">Toss</button>
+            <p><span id="tossResult">Toss Result: </span></p>
+        </div>
+        <div class="team-selection">
+            <label for="teamSelect">Select Team:</label>
+            <select id="teamSelect" disabled>
+                <option value="Team A">Pakistan</option>
+                <option value="Team B">India</option>
+            </select>
+        </div>
+        <div class="scoreboard">
+            <h2>Scoreboard</h2>
+            <p><span id="currentTeamName">Pakistan</span>: <span id="currentTeamScore">0</span>/<span id="currentTeamWickets">0</span></p>
+            <p>Overs: <span id="overs">0</span></p>
+        </div>
+        <div class="batting">
+            <h2>Batting</h2>
+            <button id="batButton" disabled>Bat</button>
+            <p>Runs: <span id="playerRuns">0</span></p>
+        </div>
+        <div class="bowling">
+            <h2>Bowling</h2>
+            <button id="bowlButton" disabled>Bowl</button>
+            <p>Delivery: <span id="deliveryType">N/A</span></p>
+        </div>
+        <div class="player-stats" id="playerStats">
+            <h2>Player Stats</h2>
+        </div>
+    </div>
+    <script>
+        // JavaScript code for your website
+        const teamSelect = document.getElementById("teamSelect");
+        const tossButton = document.getElementById("tossButton");
+        const batButton = document.getElementById("batButton");
+        const bowlButton = document.getElementById("bowlButton");
+        const currentTeamName = document.getElementById("currentTeamName");
+        const currentTeamScore = document.getElementById("currentTeamScore");
+        const currentTeamWickets = document.getElementById("currentTeamWickets");
+        const overs = document.getElementById("overs");
+        const playerRuns = document.getElementById("playerRuns");
+        const deliveryType = document.getElementById("deliveryType");
+        const playerStats = document.getElementById("playerStats");
+        const tossResult = document.getElementById("tossResult");
+        let currentTeam = "Pakistan";
+        let teamAScoreValue = 0;
+        let teamAWickets = 0;
+        let oversCount = 0;
+        let playerRunsValue = 0;
+        let currentPlayerIndex = 0;
+        let tossDone = false;
+
+        function updatePlayerList() {
+            const players = currentTeam === "Pakistan" ? pakistanPlayers : indiaPlayers;
+            currentTeamName.textContent = currentTeam;
+            currentTeamScore.textContent = teamAScoreValue;
+            currentTeamWickets.textContent = teamAWickets;
+            playerRuns.textContent = playerRunsValue;
+            overs.textContent = oversCount.toFixed(1);
+        }
+
+        function displayPlayerStats(outcome) {
+            const players = currentTeam === "Pakistan" ? pakistanPlayers : indiaPlayers;
+            const currentPlayer = players[currentPlayerIndex];
+            const playerStatsItem = document.createElement("li");
+            playerStatsItem.textContent = `${currentPlayer} - ${outcome}`;
+            playerStats.appendChild(playerStatsItem);
+        }
+
+        tossButton.addEventListener("click", function () {
+            // Simulate a coin toss result
+            const coinToss = Math.random() < 0.5 ? "Heads" : "Tails";
+            tossResult.textContent = `Toss Result: ${coinToss}`;
+            if (coinToss === "Heads") {
+                currentTeam = "Pakistan";
+                teamSelect.value = "Team A";
+            } else {
+                currentTeam = "India";
+                teamSelect.value = "Team B";
+            }
+            tossButton.disabled = true;
+            teamSelect.disabled = false;
+            batButton.disabled = false;
+            bowlButton.disabled = false;
+            updatePlayerList();
+        });
+
+        batButton.addEventListener("click", function () {
+            // Batting logic
+            // Simulate the batsman facing a delivery
+            const runs = Math.floor(Math.random() * 7); // Generate a random number between 0 and 6
+            playerRunsValue += runs;
+            if (currentTeam === "Pakistan") {
+                teamAScoreValue += runs;
+                if (runs === 0) {
+                    teamAWickets++;
+                }
+            }
+            updatePlayerList();
+            // Generate a random delivery type
+            const deliveryTypes = ["Dot Ball", "Single", "Double", "Four", "Six", "Out", "Lbw", "Wide"];
+            const randomIndex = Math.floor(Math.random() * deliveryTypes.length);
+            const randomDelivery = deliveryTypes[randomIndex];
+            deliveryType.textContent = randomDelivery;
+            if (randomDelivery === "Out" || randomDelivery === "Lbw" || randomDelivery === "Wide") {
+                // Handle player being out, lbw, or a wide ball
+                playerRunsValue = 0;
+                if (randomDelivery === "Out" || randomDelivery === "Lbw") {
+                    teamAWickets++;
+                }
+                displayPlayerStats(randomDelivery);
+            }
+        });
+
+        bowlButton.addEventListener("click", function () {
+            // Bowling logic
+            // Simulate the opponent's (India's) batting
+            const runs = Math.floor(Math.random() * 7); // Generate a random number between 0 and 6
+            playerRunsValue += runs;
+            if (currentTeam === "India") {
+                teamAScoreValue += runs;
+                if (runs === 0) {
+                    teamAWickets++;
+                }
+            }
+            updatePlayerList();
+            // Generate a random delivery type
+            const deliveryTypes = ["Dot Ball", "Single", "Double", "Four", "Six", "Out"];
+            const randomIndex = Math.floor(Math.random() * deliveryTypes.length);
+            const randomDelivery = deliveryTypes[randomIndex];
+            deliveryType.textContent = randomDelivery;
+            if (randomDelivery === "Out") {
+                // Handle the batsman getting out
+                playerRunsValue = 0;
+                teamAWickets++;
+                displayPlayerStats(randomDelivery);
+            }
+        });
+
+        const pakistanPlayers = ["Player A", "Player B", "Player C", "Player D", "Player E"];
+        const indiaPlayers = ["Player F", "Player G", "Player H", "Player I", "Player J"];
+
+        updatePlayerList();
+    </script>
+</body>
+</html>

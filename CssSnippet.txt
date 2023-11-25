@@ -1,0 +1,67 @@
+1)open setting
+2)go to user snippets
+3)then go to search bar and write css and click
+4)opened css.json file
+5)in this file under the {
+    write...
+}
+6){
+    "css snippet":{
+			"prefix":"/",
+			"body":[
+				"*{",
+					"padding: 0;",
+					"margin: 0;",
+					"box-sizing: border-box;",
+					"font-family: 'Gilroy';",
+			"}",
+			"",
+				"html,body{",
+				"width: 100%;",
+					"height: 100%;",
+				"}"
+			],
+            "description": "Css Boiler Plate"
+}
+7) Custom change any which you want e.g..
+8){
+  "Position Absolute": {
+  "prefix": "posa",
+  "body": "position: absolute;",
+  "description": "Add a position CSS property to absolute"
+  },
+  ...
+}
+9){
+  "Box Shadow": {
+    "prefix": "bsh",
+    "body": [
+      "-webkit-box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.3);",
+      "-moz-box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.3);",
+      "-ms-box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.3);",
+      "-o-box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.3);",
+      "box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.3);"
+    ],
+    "description": "Creates a standard box shadow CSS property with all vendor prefixes"
+  },
+...
+}
+10)   Snippet Caret focus#
+You can use the following syntax ${n} in order to focus the caret in a 
+specific place after you have entered your snippet. For example, in the 
+following snippet we are able to insert a value to all the following CSS 
+properties after we have chosen to use our snippet:
+
+"Transform": {
+  "prefix": "trsf",
+  "body": [
+    "-webkit-transform: ${0};",
+    "-moz-transform: ${0};",
+    "-ms-transform: ${0};",
+    "-o-transform: ${0};",
+    "transform: ${0};"
+  ],
+  "description": "Creates the transform property with input and all vendor prefixes"
+}
+
+and so on....

@@ -1,0 +1,98 @@
+*{
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Gilroy';
+}
+
+html,body{
+width: 100%;
+height: 100%;
+}
+
+header{
+    padding: 10px;
+    background-color: aliceblue;
+    height: 7%;
+    border-bottom: 2px solid #95929289;
+}
+
+nav{
+    display: flex;
+    justify-content: space-between;
+}
+nav #logo_div img{
+    width: 170px;
+    height: 170px;
+    margin-top: -70px;
+}
+
+nav #btn_div {
+  display: flex;
+  justify-content:center;
+  align-items:center;
+  margin-top: -70px;
+    gap: 20px;
+}
+
+nav #btn_div #git{
+    background-color: transparent;
+    border: none;
+    font-size: 36px;
+    cursor: pointer;
+}
+nav #btn_div #twit{
+    padding: 7px;
+    width: 150px;
+    background-color: #00acee;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+}
+nav #btn_div #face{
+    padding: 7px;
+    width: 150px;
+    background-color: #3b5998;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+nav #btn_div  i{
+    margin-right: 3px;
+}
+
+#div_nav{
+    background-color: aliceblue;
+    padding: 10px 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+#div_nav #right{
+    display: flex;
+    gap: 20px;
+}
+#div_nav #right i{
+    font-size: 20px;
+}
+
+
+#bg_btns{
+    display: flex;
+    justify-content:space-between;
+    align-items:center;
+}
+#bg_btns button{
+    padding: 30px 15px;
+    font-size: 30px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(0, 0, 0, 0.218);
+    margin-top: 250px;
+    border: none;
+    cursor: pointer;
+}
