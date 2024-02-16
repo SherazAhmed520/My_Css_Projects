@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Camera</title>
+
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .photo-item:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .photo-item img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .photo-item .options {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .photo-item:hover .options {
+            opacity: 1;
+        }
+
+        .photo-item .options button {
+            margin: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .photo-item .options button:hover {
+            background-color: #0056b3;
+        }
+
+        .photo-item .options i {
+            margin-right: 5px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <video id="video" autoplay></video>
+        <div>
+            <button onclick="openCamera()">Open Camera</button>
+            <button onclick="closeCamera()">Close Camera</button>
+            <button onclick="capture()">Capture</button>
+        </div>
+        <div id="photo-gallery"></div>
+    </div>
+
+    <script>
+        let stream;
+        let photos = [];
+
+        // Check if there are any saved photos in the local storage
+        let savedPhotos = localStorage.getItem('photos');
+
+        // If there are saved photos, parse them from JSON format
+        if (savedPhotos) {
+            photos = JSON.parse(savedPhotos);
+
+            // Display saved photos on the page
+            photos.forEach(photoURL => {
+                displayPhoto(photoURL);
+            });
+        }
+
+        async function openCamera() {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        }
+
+        function closeCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        }
+
+        function capture() {
+            const video = document.getElementById('video');
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataURL = canvas.toDataURL('image/png');
+
+            displayPhoto(dataURL);
+
+            // Save the captured image URL to local storage
+            photos.push(dataURL);
+            updateLocalStorage();
+        }
+
+        function displayPhoto(photoURL) {
+            const photoGallery = document.getElementById('photo-gallery');
+            const photoItem = document.createElement('div');
+            photoItem.classList.add('photo-item');
+
+            const img = new Image();
+            img.src = photoURL;
+            img.classList.add('photo');
+            img.onclick = function() {
+                openFullscreen(photoURL);
+            };
+
+            const options = document.createElement('div');
+            options.classList.add('options');
+            options.innerHTML = `
+                <button onclick="openFullscreen('${photoURL}')"><i class="fas fa-eye"></i>Show image</button>
+                <button onclick="deleteImage('${photoURL}')"><i class="fas fa-trash-alt"></i>Delete image</button>
+                <button onclick="shareImage('${photoURL}')"><i class="fas fa-share"></i>Share image</button>
+
+            `;
+
+            photoItem.appendChild(img);
+            photoItem.appendChild(options);
+            photoGallery.appendChild(photoItem);
+        }
+
+        function openFullscreen(imageSrc) {
+            const fullscreenImage = new Image();
+            fullscreenImage.src = imageSrc;
+            fullscreenImage.style.maxWidth = '100%';
+            fullscreenImage.style.maxHeight = '100%';
+            document.body.innerHTML = '';
+            document.body.appendChild(fullscreenImage);
+            fullscreenImage.onclick = function() {
+                window.location.reload();
+            };
+        }
+
+        function deleteImage(photoURL) {
+            const index = photos.indexOf(photoURL);
+            if (index !== -1) {
+                photos.splice(index, 1);
+                updateLocalStorage();
+                refreshGallery();
+            }
+        }
+
+        function updateLocalStorage() {
+            localStorage.setItem('photos', JSON.stringify(photos));
+        }
+
+        async function shareImage(photoURL) {
+            const bitlyAccessToken = 'YOUR_BITLY_ACCESS_TOKEN';
+            const longURL = encodeURIComponent(photoURL);
+            const bitlyURL = `https://api-ssl.bitly.com/v4/shorten`;
+
+            try {
+                const response = await fetch(bitlyURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${bitlyAccessToken}`,
+                    },
+                    body: JSON.stringify({ long_url: longURL, domain: 'bit.ly' }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to shorten URL');
+                }
+
+                const data = await response.json();
+                const shortURL = data.link;
+
+                const sharePopup = window.open('', '_blank', 'width=600,height=400');
+                sharePopup.document.write(`
+                    <h2>Share Image</h2>
+                    <button onclick="shareOnFacebook('${shortURL}')">Share on Facebook</button>
+                    <button onclick="shareOnTwitter('${shortURL}')">Share on Twitter</button>
+                    <!-- Add more buttons for other social media platforms as needed -->
+                `);
+            } catch (error) {
+                console.error('Error sharing image:', error);
+            }
+        }
+
+        function shareOnFacebook(shortURL) {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${shortURL}`, '_blank');
+        }
+
+        function shareOnTwitter(shortURL) {
+            window.open(`https://twitter.com/intent/tweet?url=${shortURL}`, '_blank');
+        }
+
+        function refreshGallery() {
+            const photoGallery = document.getElementById('photo-gallery');
+            photoGallery.innerHTML = '';
+            photos.forEach(photoURL => {
+                displayPhoto(photoURL);
+            });
+        }
+    </script>
+</body>
+</html>
